@@ -12,7 +12,7 @@
 with source_data as (
 
     select "gb" as country, *
-    from gb_feed
+    from vivastreet_production.gb_feed
 
 )
 
