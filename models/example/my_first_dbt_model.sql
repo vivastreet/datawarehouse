@@ -16,7 +16,7 @@ with source_data as (
 
 )
 
-select id::integer as id, *
+select *
 from source_data
 
 /*
