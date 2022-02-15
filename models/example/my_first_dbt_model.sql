@@ -11,12 +11,12 @@
 
 with source_data as (
 
-    select 'gb' as country, *
+    select 'gb' as country, cast(id as integer), *
     from vivastreet_production.gb_feed
 
 )
 
-select country, id INTEGER
+select *
 from source_data
 
 /*
