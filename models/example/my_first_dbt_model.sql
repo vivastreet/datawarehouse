@@ -16,7 +16,7 @@ with source_data as (
 
 )
 
-select country, id::INTEGER as id
+select country, id INTEGER
 from source_data
 
 /*
