@@ -1,6 +1,5 @@
 
 {{ config(
-    materialized='incremental',
     unique_key='_airbyte_ab_id'
     )
 }}

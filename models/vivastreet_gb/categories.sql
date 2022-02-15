@@ -1,8 +1,6 @@
 
 {{ config(
-    materialized='incremental',
-    unique_key='_airbyte_ab_id',
-    on_schema_change='sync_all_columns'
+    unique_key='_airbyte_ab_id'
     )
 }}
 
