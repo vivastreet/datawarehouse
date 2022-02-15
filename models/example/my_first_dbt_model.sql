@@ -11,7 +11,7 @@
 
 with source_data as (
 
-    select 'gb' as country, cast(id as integer), *
+    select 'gb' as country, cast(id as integer) as id, *
     from vivastreet_production.gb_feed
 
 )
