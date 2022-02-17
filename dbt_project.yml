@@ -35,4 +35,4 @@ models:
   vivastreet_production:
     # Applies to all files under models/vivastreet_gb/
     vivastreet_production:
-      materialized: incremental
+      materialized: table
