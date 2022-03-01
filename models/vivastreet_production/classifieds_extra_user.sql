@@ -15,4 +15,4 @@ WITH source_data as (
 
 
 SELECT k.*
-FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country id, user_id, classified_created )
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country, id, user_id)
