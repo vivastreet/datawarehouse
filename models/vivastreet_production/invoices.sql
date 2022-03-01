@@ -1,12 +1,11 @@
 
 {{ config(
     unique_key='_airbyte_ab_id',
-    cluster_by=["transaction_id"]
+    cluster_by=["order_id"]
     )
 }}
 
 with source_data as (
-
     select _airbyte_ab_id, cast(id as integer) as id, cast(sent as timestamp) as sent, email, items, LOWER(country) as country, cast(created as timestamp) as created, category, order_id, processor_code, cast(REPLACE(REPLACE (subtotal, ',', '.'), '.00', '') as numeric) as subtotal, cast(REPLACE(REPLACE (total, ',', '.'), '.00', '') as numeric) as total, cast(REPLACE (vat, ',', '.') as numeric) as vat, vat_percentage
     from vivastreet_production.common_invoices
     where created > '2019-01-01'

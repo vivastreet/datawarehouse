@@ -1,7 +1,7 @@
 
 {{ config(
     unique_key='_airbyte_ab_id',
-    cluster_by=["transaction_id"]
+    cluster_by=["transaction_id", "id"]
     )
 }}
 
