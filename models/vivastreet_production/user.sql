@@ -2,8 +2,8 @@
 {{ config(
     unique_key='_airbyte_ab_id',
     partition_by={
-       "field": "created_at",
-       "data_type": "date"
+       "field": "user_id",
+       "data_type": "integer"
     }
     )
 }}
