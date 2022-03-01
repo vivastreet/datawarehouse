@@ -106,24 +106,8 @@ WITH categories as (
      payment_solution_payments as (
          SELECT
              ps.transaction_id,
-             id,
-             CASE
-                 WHEN ps.description = 'vivastreet.co.uk' THEN 'gb'
-                 WHEN ps.description = 'vivastreet.co.in' THEN 'in'
-                 WHEN ps.description = 'vivastreet.com' THEN 'fr'
-                 WHEN ps.description = 'vivavisos.com.ar' THEN 'ar'
-                 WHEN ps.description = 'vivastreet.cl' THEN 'cl'
-                 WHEN ps.description = 'vivalocal.com' THEN 'br'
-                 WHEN ps.description = 'Let Pay Simple Boleto' THEN 'br'
-                 WHEN ps.description = 'Let Pay Simple Pix' THEN 'br'
-                 WHEN ps.description = 'vivastreet.co' THEN 'co'
-                 WHEN ps.description = 'vivastreet.it' THEN 'it'
-                 WHEN ps.description = 'Volt Bank Transfer' THEN 'gb'
-                 WHEN ps.description = 'vivastreet.be' THEN 'be'
-                 WHEN ps.description = 'vivastreet.ma' THEN 'ma'
-                 WHEN ps.description = 'vivastreet.ie' THEN 'ie'
-                 WHEN ps.description = 'vivalocal.pt' THEN 'pt'
-                 END Country,
+             ps.id,
+             ps.country,
              ps.customer as user_id,
              ps.status,
              ps.amount,
@@ -131,6 +115,15 @@ WITH categories as (
              ps.transaction_at
          FROM `vivastreet_production.payments` ps
      ),
+
+     classifieds_archive as (
+         SELECT c.id, c.user_id, c.created, c.country, phone_nbr
+         FROM `data-warehouse-326816.vivastreet_production.classifieds` c
+         UNION ALL
+         SELECT ca.id, ca.user_id, CAST(ca.created as TIMESTAMP) created, 'gb' as country, ca.phone_nbr
+         FROM `data-warehouse-326816.vivastreet_production.archive_gb` ca
+     ),
+
      classifieds as (
          SELECT c.id,
                 c.created as classified_created,
@@ -140,29 +133,17 @@ WITH categories as (
                 u.created user_created,
                 ce.teaser_interval as ce_teaser_interval,
                 ce.discount_interval as ce_discount_interval,
-         FROM (
-                  SELECT c.id, c.user_id, c.created, c.country, phone_nbr
-                  FROM `data-warehouse-326816.vivastreet_production.classifieds` c
-                  UNION ALL
-                  SELECT ca.id, ca.user_id, CAST(ca.created as TIMESTAMP) created, 'gb' as country, ca.phone_nbr
-                  FROM `data-warehouse-326816.vivastreet_production.archive_gb` ca
-              ) c
+         FROM classifieds_archive c
                   LEFT JOIN `vivastreet_production.classified_extra` ce
                             ON ce.classified_id = c.id
-                                and ce.country = 'gb'
+                                and ce.country = c.country
                   LEFT JOIN `data-warehouse-326816.vivastreet_production.user` u ON
                  CAST(c.user_id as STRING) = CAST(u.user_id as STRING)
      ),
+
      payment_suite_orders as (
          SELECT
-             CASE WHEN
-                          brand = 'vivastreet.co.uk' THEN 'gb'
-                  WHEN brand = 'vivalocal.com' THEN 'br'
-                  WHEN brand = 'vivastreet.cl' THEN 'cl'
-                  WHEN brand = 'vivastreet.com' THEN 'fr'
-                  WHEN brand = 'vivastreet.be' THEN 'be'
-                  WHEN brand = 'vivastreet.it' THEN 'it'
-                 END Country,
+             country,
              boleto_id,
              safe_cast(date as TIMESTAMP) date,
     safe_cast(paid_date as TIMESTAMP) paid_date,
@@ -211,8 +192,8 @@ SELECT * FROM
     )
     ),
 
-    ads_orders as (
-SELECT
+ads_orders as (
+    SELECT
     ps_transaction_id as `Order_ID`,
     cr_order_id as  `Local_Order_Id`,
     ps_transaction_at as `Date`,
@@ -230,10 +211,10 @@ SELECT
     c.Subcategory  as `Subcategory`,
     pso_payment_method as `Source`,
     p.pso_amount  as `Total`,
-    ROUND(CAST(cr_amount as FLOAT64)-CAST(IFNULL(pso_service_fee, '0') as FLOAT64), 2) as `Subtotal`,
-    IFNULL(pso_service_fee, '0') as `Service_Charge`,
+    CAST(cr_amount as FLOAT64)-CAST(pso_service_fee as FLOAT64) as `Subtotal`,
+    IFNULL(pso_service_fee, '0.0') as `Service_Charge`,
     i_vat as `VAT`,
-    i_vat_percentage as `VAT_Percentage`,
+    i_vat_percentage as `VAT_PERCENTAGE`,
     pso_plan_types as `Plans`,
     po.p2v_duration  as `P2V_Current_Length`,
     po.p2v_price  as `P2v_Current_Price`,
@@ -307,13 +288,12 @@ FROM payments p
     pi.email = p.cr_email
     ),
 
-    source_data as (
-        SELECT * FROM (
-            SELECT k.*
-            FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, date, User_ID, country)
-            )
-        WHERE LOWER(country) = 'gb'
-        ORDER BY date desc
+    datasource as (
+    SELECT * FROM (
+        SELECT k.*
+        FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, date, User_ID, country)
+        )
     )
 
-SELECT * FROM source_data
+
+SELECT * FROM datasource
