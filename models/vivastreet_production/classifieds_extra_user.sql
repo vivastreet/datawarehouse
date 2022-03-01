@@ -9,12 +9,10 @@ WITH source_data as (
            ce.discount_interval as ce_discount_interval,
     FROM {{ ref('classifieds') }} c
     LEFT JOIN {{ ref ('classified_extra') }} ce
-ON ce.classified_id = c.id
-    and ce.country = c.country
-    LEFT JOIN {{ ref ('user') }} u ON
-    CAST (c.user_id as STRING) = CAST (u.user_id as STRING)
-    )
+    ON ce.classified_id = c.id AND ce.country = c.country
+    LEFT JOIN {{ ref ('user') }} u ON CAST (c.user_id as STRING) = CAST (u.user_id as STRING)
+)
 
 
 SELECT k.*
-FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country id, user_id, created )
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country id, user_id, classified_created )

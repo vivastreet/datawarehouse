@@ -13,7 +13,7 @@ with source_data as (
 )
 
 SELECT k.*
-FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY id, country, clad_id, order_id )
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country, clad_revenue_id, order_id )
 
 /*
     Uncomment the line below to remove records with null `id` values
