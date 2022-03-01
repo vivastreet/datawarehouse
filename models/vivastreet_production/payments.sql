@@ -30,8 +30,8 @@ with source_data as (
     WHERE created_at > '2019-01-01'
 )
 
-select *
-from source_data
+SELECT k.*
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY transaction_id, id, country )
 
 /*
     Uncomment the line below to remove records with null `id` values

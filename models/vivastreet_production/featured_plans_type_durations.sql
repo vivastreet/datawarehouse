@@ -5,8 +5,8 @@ SELECT plan.country, price, type, plan.plan_id, duration.seconds, plan_type.name
     LEFT JOIN {{ ref('featured_durations') }} duration ON (duration.duration_id = plan.duration_id AND duration.country = plan.country)
 )
 
-select *
-from source_data
+SELECT k.*
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country, plan_id)
 
 /*
 Uncomment the line below to remove records with null `id` values
