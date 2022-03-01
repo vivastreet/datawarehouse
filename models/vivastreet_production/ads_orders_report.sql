@@ -307,13 +307,13 @@ FROM payments p
     pi.email = p.cr_email
     ),
 
-source_data as (
-    SELECT * FROM (
-        SELECT k.*
-        FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, date, User_ID, country)
-        )
-    order by date desc
+    source_data as (
+        SELECT * FROM (
+            SELECT k.*
+            FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, date, User_ID, country)
+            )
+        WHERE LOWER(country) = 'gb'
+        ORDER BY date desc
     )
-
 
 SELECT * FROM source_data
