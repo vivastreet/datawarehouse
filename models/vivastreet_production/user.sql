@@ -1,10 +1,7 @@
 
 {{ config(
     unique_key='_airbyte_ab_id',
-    partition_by={
-       "field": "user_id",
-       "data_type": "integer"
-    }
+    cluster_by=["user_id"]
     )
 }}
 
