@@ -1,6 +1,10 @@
 
 {{ config(
-    unique_key='_airbyte_ab_id'
+    unique_key='_airbyte_ab_id',
+    partition_by={
+       "field": "sent",
+       "data_type": "date"
+    }
     )
 }}
 
