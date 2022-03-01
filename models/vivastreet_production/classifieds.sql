@@ -13,8 +13,8 @@ with source_data as (
     from vivastreet_production.archive_gb
 )
 
-select *
-from source_data
+SELECT k.*
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY country, id, user_id )
 
 /*
     Uncomment the line below to remove records with null `id` values
