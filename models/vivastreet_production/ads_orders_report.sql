@@ -42,9 +42,9 @@
          FROM (
                   SELECT pso.country, pso.processed_at, provider_id, price, type, user_id, CAST(ROUND(fp.seconds/(3600*24), 0) as INT64) duration,
                   FROM vivastreet_production.payment_solution_orders pso, UNNEST(SPLIT(plan_ids)) plan_ids
-                                                                              LEFT JOIN featured_plans fp
-                                                                                        ON fp.country = pso.country
-                                                                                            and CAST(fp.plan_id as STRING) = plan_ids
+                  LEFT JOIN featured_plans fp
+                  ON fp.country = pso.country
+                  AND CAST(fp.plan_id as STRING) = plan_ids
               ) fpo
          GROUP BY country, provider_id, user_id, processed_at
      ),
