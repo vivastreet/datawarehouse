@@ -8,7 +8,7 @@ WITH source_data as (
            ce.teaser_interval   as ce_teaser_interval,
            ce.discount_interval as ce_discount_interval,
     FROM {{ ref('classifieds') }} c
-    LEFT JOIN {{ ref ('classifieds_extra') }} ce
+    LEFT JOIN {{ ref ('classified_extra') }} ce
 ON ce.classified_id = c.id
     and ce.country = c.country
     LEFT JOIN {{ ref ('user') }} u ON
