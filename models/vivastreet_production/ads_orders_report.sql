@@ -201,7 +201,7 @@
             c.Umbrella  as `Umbrella`,
             c.Subcategory  as `Subcategory`,
             pso_payment_method as `Source`,
-            p.pso_amount  as `Total`,
+            p.ps_amount  as `Total`,
             CAST(cr_amount as FLOAT64)-CAST(pso_service_fee as FLOAT64) as `Subtotal`,
             IFNULL(pso_service_fee, '0.0') as `Service_Charge`,
             i_vat as `VAT`,
@@ -279,7 +279,7 @@
             pi.email = p.cr_email
     ),
 
-    datasource as (
+    source_data as (
         SELECT * FROM (
             SELECT k.*
             FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, date, User_ID, country)
@@ -287,4 +287,4 @@
     )
 
 
-SELECT * FROM datasource
+SELECT * FROM source_data
