@@ -8,7 +8,8 @@ with source_data as (
     select _airbyte_ab_id, 
     cast(id as integer) as id, 
     'gb' as country, 
-    cast(date as timestamp) as date, flag, 
+    cast(date as timestamp) as date, 
+    flag, 
     cast(amount as numeric) as amount, 
     method, 
     noiredata,
@@ -23,6 +24,7 @@ with source_data as (
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_token") as token,
     SAFE_CAST(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId") as integer) as adId
     FROM vivastreet_production.autopilot_gb_payments
+    WHERE date > '2019-01-01'
 )
 
 SELECT * FROM source_data
