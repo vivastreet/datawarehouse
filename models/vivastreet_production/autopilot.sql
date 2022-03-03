@@ -21,7 +21,7 @@ with source_data as (
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_category") as category,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_email") as email,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_token") as token,
-    cast(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId", integer) as adId
+    cast(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId") as integer) as adId
     FROM vivastreet_production.autopilot_gb_payments
 )
 
