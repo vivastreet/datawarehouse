@@ -14,14 +14,14 @@ with source_data as (
     noiredata,
     JSON_EXTRACT_SCALAR(noiredata, '$.id') as noire_id, 
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_plan") as plan,
-    cast(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_userId") as integer) as userId,
+    SAFE_CAST(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_userId") as integer) as userId,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_EndToEndIdentity") as EndToEndIdentity,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_location") as location,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_userName") as userName,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_category") as category,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_email") as email,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_token") as token,
-    cast(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId") as integer) as adId
+    SAFE_CAST(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId") as integer) as adId
     FROM vivastreet_production.autopilot_gb_payments
 )
 
