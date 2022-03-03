@@ -180,6 +180,13 @@
             null as cr_amount, null as cr_email,null as cr_clad_id,null as cr_init_by,null as cr_plan_id,null as cr_user_id,null as cr_zipcode,id as cr_order_id,null as cr_platform,null as cr_processed,null as cr_proxy_type,null as cr_renew_type,null as cr_location_id,null as cr_subcat_code,null as cr_partner_name,null as cr_customer_name,null as cr_discount_type,null as cr_posting_status,null as cr_proxy_username,null as cr_clad_revenue_id,null as cr_existing_status,null as cr_individual_type,'payment_suite' as cr_transaction_type,null as cr_clad_affiliate_id,null as cr_user_affiliate_id,
             null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage
             FROM payment_suite_orders ps
+            UNION ALL
+            SELECT
+            country as ps_country,noire_id as ps_transaction_id,null as ps_id,SAFE_CAST(userId as INT64) as ps_user_id,null as ps_status,amount as ps_amount,null as ps_client_confirm,date as ps_transaction_at,
+            null as pso_id, null as pso_classified_id,null as pso_plan_ids, plan as pso_plan_types,null as pso_transaction_id,null as pso_provider_id,null as pso_result_code,null as pso_refunded,null as pso_processed_at,null as pso_created_at,null as pso_updated_at,null as pso_amount,null as pso_currency,null as pso_status,null as pso_denialid,null as pso_service_fee,null as pso_payment_method,null as pso_boleto_url,
+            null as cr_amount, null as cr_email,SAFE_CAST(adId as integer) as cr_clad_id,null as cr_init_by,null as cr_plan_id,null as cr_user_id,null as cr_zipcode,id as cr_order_id,null as cr_platform,null as cr_processed,null as cr_proxy_type,null as cr_renew_type,null as cr_location_id,null as cr_subcat_code,null as cr_partner_name,null as cr_customer_name,null as cr_discount_type,null as cr_posting_status,null as cr_proxy_username,null as cr_clad_revenue_id,null as cr_existing_status,null as cr_individual_type,'auto_pilot' as cr_transaction_type,null as cr_clad_affiliate_id,null as cr_user_affiliate_id,
+            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage
+            FROM `data-warehouse-326816.vivastreet_production.autopilot`
         )
     ),
 
