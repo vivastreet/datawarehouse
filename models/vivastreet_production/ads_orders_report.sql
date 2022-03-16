@@ -172,7 +172,7 @@
             and i.order_id = CAST( pso.id as STRING)
             and date(i.sent) = date(cr.processed)
             and LOWER(i.country) = LOWER(ps.country)
-            WHERE ps.status = 'completed'
+            WHERE (ps.status = 'completed' or ((ps.status = 'forwarding' or ps.status = 'refunded')  and ps.client_confirm = 'confirmed'))
             UNION ALL
             SELECT
             country as ps_country,boleto_id as ps_transaction_id,null as ps_id,user_id as ps_user_id,null as ps_status,boleto_amount as ps_amount,null as ps_client_confirm,IF(paid_date>date,paid_date, date) as ps_transaction_at,
