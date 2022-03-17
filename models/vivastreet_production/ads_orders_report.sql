@@ -202,7 +202,7 @@
         SELECT
             ps_transaction_id as `Order_ID`,
             cr_order_id as  `Local_Order_Id`,
-            ps_transaction_at as `Date`,
+            COALESCE(pso_processed_at, ps_transaction_at) as `Date`,
             ps_user_id as `User_ID`,
             cl.phone_nbr as `User_Phone_Number`,
             cl.user_created  as `Account_Creation_Date`,
