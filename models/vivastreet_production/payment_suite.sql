@@ -16,7 +16,7 @@ with source_data as (
         WHEN brand = 'vivastreet.it'    THEN 'it'
     END country,
     cast(id as integer) as id, geo, cast(date as timestamp) as date, brand, cast(user_id as integer) as user_id, boleto_id, paid_date, client_cpf, plans_sold, client_name, sales_agent, client_email, cast(boleto_amount as numeric) as boleto_amount, cast(boleto_status as integer) as boleto_status, client_surname, sales_agent_email,
-    from vivastreet_production.payment_suite_brcs_boleto_log
+    from data_lake.payment_suite_brcs_boleto_log
     where date > '2019-01-01'
 )
 

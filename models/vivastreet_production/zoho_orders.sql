@@ -26,7 +26,7 @@ WITH source_data as (
     JSON_EXTRACT_SCALAR(r, '$.Modified_By.id') as modified_by_id,
     JSON_EXTRACT_SCALAR(r, '$.SO_Number') as so_number,
     JSON_EXTRACT_SCALAR(r, '$.id') as id
-    FROM vivastreet_production._airbyte_raw_zoho_sales_orders, 
+    FROM data_lake._airbyte_raw_zoho_sales_orders, 
     UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
 )
 
