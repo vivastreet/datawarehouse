@@ -5,7 +5,7 @@
 }}
 
 with source_data as (
-    SELECT _airbyte_ab_id, 'gb' as country, CAST(id as INTEGER) id, name, label, CAST(display_priority as INTEGER) as display_priority FROM vivastreet_production.gb_featured_plan_type
+    SELECT _airbyte_ab_id, 'gb' as country, CAST(id as INTEGER) id, name, label, CAST(display_priority as INTEGER) as display_priority FROM data_lake.gb_featured_plan_type
 )
 
 SELECT k.*

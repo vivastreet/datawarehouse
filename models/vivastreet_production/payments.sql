@@ -26,7 +26,7 @@ with source_data as (
         WHEN ps.description = 'vivalocal.pt' THEN 'pt'
     END country,
     cast(id as integer) as id, type, cast(amount as numeric) as amount, client, reason, status, gateway, cast(customer as integer) as customer, cast(created_at as timestamp) as created_at, token_hash, cast(updated_at as timestamp) as updated_at, description, return_data, cast(payment_card as integer) as payment_card, client_confirm, cast(transaction_at as timestamp) as transaction_at, transaction_id
-    FROM vivastreet_production.payment_solution_payments ps
+    FROM data_lake.payment_solution_payments ps
     WHERE created_at > '2019-01-01'
 )
 
