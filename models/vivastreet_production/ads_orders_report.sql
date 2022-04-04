@@ -15,6 +15,10 @@
          LEFT JOIN vivastreet_production.featured_durations duration ON (duration.duration_id = plan.duration_id AND duration.country = plan.country)
      ),
 
+     vat_rates as (
+         SELECT * FROM `data-warehouse-326816.vivastreet_production.vat_rates`
+     ),
+
      plans_orders as (
          SELECT country, provider_id, user_id,
                 SUM(IF(fpo.type = 'featured' , duration, 0)) as featured_duration,
@@ -156,7 +160,8 @@
             ps.country as ps_country,ps.transaction_id as ps_transaction_id,ps.id as ps_id,ps.user_id as ps_user_id,ps.status as ps_status,ps.amount as ps_amount,ps.client_confirm as ps_client_confirm,ps.transaction_at as ps_transaction_at,
             pso.id as pso_id, pso.classified_id as pso_classified_id,pso.plan_ids as pso_plan_ids,pso.plan_types as pso_plan_types,pso.transaction_id as pso_transaction_id,pso.provider_id as pso_provider_id,pso.result_code as pso_result_code,pso.refunded as pso_refunded,pso.processed_at as pso_processed_at,pso.created_at as pso_created_at,pso.updated_at as pso_updated_at,pso.amount as pso_amount,pso.currency as pso_currency,pso.status as pso_status,pso.denialid as pso_denialid,pso.service_fee as pso_service_fee,pso.payment_method as pso_payment_method,pso.boleto_url as pso_boleto_url,
             cr.amount as cr_amount, cr.email as cr_email,cr.clad_id as cr_clad_id,cr.init_by as cr_init_by,cr.plan_id as cr_plan_id,cr.user_id as cr_user_id,cr.zipcode as cr_zipcode,cr.order_id as cr_order_id,cr.platform as cr_platform,cr.processed as cr_processed,cr.proxy_type as cr_proxy_type,cr.renew_type as cr_renew_type,cr.location_id as cr_location_id,cr.subcat_code as cr_subcat_code,cr.partner_name as cr_partner_name,cr.customer_name as cr_customer_name,cr.discount_type as cr_discount,cr.posting_status as cr_posting_status,cr.proxy_username as cr_proxy_username,cr.clad_revenue_id as cr_clad_revenue_id,cr.existing_status as cr_existing_status,cr.individual_type as cr_individual_type,'payment_solution' as cr_transaction_type,cr.clad_affiliate_id as cr_clad_affiliate_id,cr.user_affiliate_id as cr_user_affiliate_id,
-            i.id as i_id,i.sent as i_sent,i.email as i_email,i.items as i_items,i.country as i_country,i.created as i_created,i.category as i_category,i.order_id as i_order_id,i.processor_code as i_processor_code,i.subtotal as i_subtotal,i.total as i_total,i.vat as i_vat,i.vat_percentage  as i_vat_percentage
+            i.id as i_id,i.sent as i_sent,i.email as i_email,i.items as i_items,i.country as i_country,i.created as i_created,i.category as i_category,i.order_id as i_order_id,i.processor_code as i_processor_code,i.subtotal as i_subtotal,i.total as i_total,i.vat as i_vat, i.vat_percentage,
+            (SELECT ANY_VALUE(vat) from vat_rates vr WHERE vr.country = ps.country and DATE_TRUNC(DATE(ps.transaction_at), MONTH) = DATE_TRUNC(DATE(vr.date), MONTH)) vr_vat_percentage
             FROM payment_solution_payments ps
             LEFT JOIN `vivastreet_production.payment_solution_orders` pso
             ON pso.user_id = ps.user_id
@@ -178,22 +183,25 @@
             country as ps_country,boleto_id as ps_transaction_id,null as ps_id,user_id as ps_user_id,null as ps_status,boleto_amount as ps_amount,null as ps_client_confirm,IF(paid_date>date,paid_date, date) as ps_transaction_at,
             null as pso_id, null as pso_classified_id,null as pso_plan_ids, plans_sold as pso_plan_types,null as pso_transaction_id,null as pso_provider_id,null as pso_result_code,null as pso_refunded,null as pso_processed_at,null as pso_created_at,null as pso_updated_at,null as pso_amount,null as pso_currency,null as pso_status,null as pso_denialid,null as pso_service_fee,null as pso_payment_method,null as pso_boleto_url,
             null as cr_amount, null as cr_email,null as cr_clad_id,null as cr_init_by,null as cr_plan_id,null as cr_user_id,null as cr_zipcode,id as cr_order_id,null as cr_platform,null as cr_processed,null as cr_proxy_type,null as cr_renew_type,null as cr_location_id,null as cr_subcat_code,null as cr_partner_name,null as cr_customer_name,null as cr_discount_type,null as cr_posting_status,null as cr_proxy_username,null as cr_clad_revenue_id,null as cr_existing_status,null as cr_individual_type,'payment_suite' as cr_transaction_type,null as cr_clad_affiliate_id,null as cr_user_affiliate_id,
-            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage
+            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage,
+            (SELECT ANY_VALUE(vat) from vat_rates vr WHERE LOWER(vr.country) = LOWER(ps.country) and DATE_TRUNC(DATE(IF(ps.paid_date>ps.date,ps.paid_date, ps.date)), MONTH) = DATE_TRUNC(vr.date, MONTH)) vr_vat_percentage
             FROM payment_suite_orders ps
             UNION ALL
             SELECT
             country as ps_country,noire_id as ps_transaction_id,null as ps_id,SAFE_CAST(userId as INT64) as ps_user_id,null as ps_status,amount as ps_amount,null as ps_client_confirm,date as ps_transaction_at,
             null as pso_id, null as pso_classified_id,null as pso_plan_ids, plan as pso_plan_types,null as pso_transaction_id,null as pso_provider_id,null as pso_result_code,null as pso_refunded,null as pso_processed_at,null as pso_created_at,null as pso_updated_at,null as pso_amount,null as pso_currency,null as pso_status,null as pso_denialid,null as pso_service_fee,null as pso_payment_method,null as pso_boleto_url,
             null as cr_amount, null as cr_email,SAFE_CAST(adId as integer) as cr_clad_id,null as cr_init_by,null as cr_plan_id,null as cr_user_id,null as cr_zipcode,id as cr_order_id,null as cr_platform,null as cr_processed,null as cr_proxy_type,null as cr_renew_type,null as cr_location_id,null as cr_subcat_code,null as cr_partner_name,null as cr_customer_name,null as cr_discount_type,null as cr_posting_status,null as cr_proxy_username,null as cr_clad_revenue_id,null as cr_existing_status,null as cr_individual_type, 'autopilot' as cr_transaction_type,null as cr_clad_affiliate_id,null as cr_user_affiliate_id,
-            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage
-            FROM `data-warehouse-326816.vivastreet_production.autopilot`
+            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage,
+            (SELECT ANY_VALUE(vat) from vat_rates vr WHERE LOWER(vr.country) = LOWER(ap.country) and DATE_TRUNC(date, MONTH) = DATE_TRUNC(vr.date, MONTH)) vr_vat_percentage
+            FROM `data-warehouse-326816.vivastreet_production.autopilot` ap
             UNION ALL
             SELECT
             country as ps_country,so_number as ps_transaction_id,null as ps_id,SAFE_CAST(user_id_payment_email as INT64) as ps_user_id,null as ps_status,SAFE_CAST(sub_total as NUMERIC) as ps_amount,null as ps_client_confirm,SAFE_CAST(created_time as TIMESTAMP)ps_transaction_at,
             null as pso_id, null as pso_classified_id,null as pso_plan_ids, description as pso_plan_types,null as pso_transaction_id,null as pso_provider_id,null as pso_result_code,null as pso_refunded,null as pso_processed_at,null as pso_created_at,null as pso_updated_at,null as pso_amount,null as pso_currency,null as pso_status,null as pso_denialid,null as pso_service_fee,null as pso_payment_method,null as pso_boleto_url,
             null as cr_amount, null as cr_email,SAFE_CAST(REGEXP_EXTRACT(ad_id, r'([0-9]+)') as integer) as cr_clad_id,null as cr_init_by,null as cr_plan_id,null as cr_user_id,null as cr_zipcode,SAFE_CAST(id as NUMERIC) as cr_order_id,null as cr_platform,null as cr_processed,null as cr_proxy_type,null as cr_renew_type,null as cr_location_id,null as cr_subcat_code,null as cr_partner_name,null as cr_customer_name,null as cr_discount_type,null as cr_posting_status,null as cr_proxy_username,null as cr_clad_revenue_id,null as cr_existing_status,null as cr_individual_type, 'zoho_bank_transfer' as cr_transaction_type,null as cr_clad_affiliate_id,null as cr_user_affiliate_id,
-            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage
-            FROM `data-warehouse-326816.vivastreet_production.zoho_orders`
+            null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage,
+            (SELECT ANY_VALUE(vat) from vat_rates vr WHERE LOWER(vr.country) = LOWER(zo.country) and DATE_TRUNC(DATE(SAFE_CAST(created_time as TIMESTAMP)), MONTH) = DATE_TRUNC(DATE(vr.date), MONTH)) vr_vat_percentage
+            FROM `data-warehouse-326816.vivastreet_production.zoho_orders` zo
             WHERE payment_method = 'Bank/Online Transfer'
         )
     ),
@@ -217,11 +225,10 @@
             c.Subcategory  as `Subcategory`,
             pso_payment_method as `Source`,
             p.ps_amount  as `Total`,
-            p.ps_amount/(1+i_VAT)  as `Total_NET`,
+            p.ps_amount/(1+vr_vat_percentage)  as `Total_NET`,
             CAST(cr_amount as FLOAT64)-CAST(pso_service_fee as FLOAT64) as `Subtotal`,
-            IFNULL(pso_service_fee, '0.0') as `Service_Charge`,
-            i_vat as `VAT`,
-            i_vat_percentage as `VAT_PERCENTAGE`,
+            IFNULL(pso_service_fee, '0.0') as `Service_Charge`,            
+            vr_vat_percentage as `VAT_PERCENTAGE`,
             pso_plan_types as `Plans`,
             pi.p2v_duration  as `P2V_Length`,
             pi.p2v_price  as `P2v_Price`,
