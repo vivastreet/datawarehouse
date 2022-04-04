@@ -23,7 +23,7 @@ with source_data as (
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_email") as email,
     JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_token") as token,
     SAFE_CAST(JSON_EXTRACT_SCALAR(noiredata, "$.customParameters.SHOPPER_adId") as integer) as adId
-    FROM vivastreet_production.autopilot_gb_payments
+    FROM data_lake.autopilot_gb_payments
     WHERE date > '2019-01-01'
 )
 
