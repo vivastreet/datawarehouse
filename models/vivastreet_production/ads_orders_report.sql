@@ -168,7 +168,7 @@
             AND pso.provider_id = ps.transaction_id
             AND LOWER(ps.country) = LOWER(pso.country)
             LEFT JOIN `vivastreet_production.clad_revenue` cr
-            ON cr.order_id = ps.id
+            ON SAFE_CAST(cr.order_id as INTEGER) = ps.id
             and LOWER(ps.country) = LOWER(cr.country)
             and cr.user_id = ps.user_id
             LEFT JOIN `vivastreet_production.invoices` i
