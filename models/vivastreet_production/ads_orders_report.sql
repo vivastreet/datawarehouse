@@ -134,6 +134,7 @@
                   and ce.country = c.country
                   LEFT JOIN `data-warehouse-326816.vivastreet_production.user` u ON
                  CAST(c.user_id as STRING) = CAST(u.user_id as STRING)
+                 and c.country = u.country
      ),
 
      payment_suite_orders as (
