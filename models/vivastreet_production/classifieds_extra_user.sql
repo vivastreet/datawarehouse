@@ -10,7 +10,9 @@ WITH source_data as (
     FROM {{ ref('classifieds') }} c
     LEFT JOIN {{ ref ('classified_extra') }} ce
     ON ce.classified_id = c.id AND ce.country = c.country
-    LEFT JOIN {{ ref ('user') }} u ON CAST (c.user_id as STRING) = CAST (u.user_id as STRING)
+    LEFT JOIN {{ ref ('user') }} u ON 
+        (CAST (c.user_id as STRING) = CAST (u.user_id as STRING) 
+        and u.src_country = c.country)
 )
 
 
