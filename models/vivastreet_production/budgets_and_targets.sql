@@ -4,4 +4,5 @@ with source_data as (
     WHERE date is not null
 )
 
-SELECT * FROM source_data
+SELECT k.*
+FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data x GROUP BY Type,Date,Month_,Country,Budget_ex_VAT,Daily_run_rate_revenue_,NB_of_Orders,Daily_Run_Rate__orders,AOV)
