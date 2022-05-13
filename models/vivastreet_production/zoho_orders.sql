@@ -1,8 +1,3 @@
-{{ config(
-    unique_key='_airbyte_ab_id'
-    )
-}}
-
 WITH source_data_historical as (
     SELECT 'gb' as country,
         SALESORDERID, 
@@ -21,7 +16,7 @@ WITH source_data_historical as (
         Date_du_paiement as Payment_Received_Date,        
         Type_paiement as Payment_Method,
         Gestionnaire_de_Produit as Sales_Order_Owner,       
-        SAFE_CAST(REGEXP_EXTRACT(Total_G__n__ral, r'([0-9.]+)') as NUMERIC) as Grand_Total,
+        Total_G__n__ral as Grand_Total,
         CAST(N___de_client as STRING) as User_ID,
         Description__Articles_command__s_ as Description
         FROM data_lake.zoho_adhoc_fr
@@ -38,14 +33,14 @@ WITH source_data_historical as (
         FROM data_lake.zoho_adhoc_be
 ),
 
-WITH source_data_automated as (
+source_data_automated as (
     SELECT
         'gb' as country,
         JSON_EXTRACT_SCALAR(r, '$.id') as ID,
         CAST(JSON_EXTRACT_SCALAR(r, '$.Grand_Total') as NUMERIC ) as Grand_Total,  
         JSON_EXTRACT_SCALAR(r, '$.Description') as description, 
         JSON_EXTRACT_SCALAR(r, '$.User_ID_payment_email') as User_ID,  
-        JSON_EXTRACT_SCALAR(r, '$.Payment_Received_Date') as payment_received_date,  
+        DATE(CAST(JSON_EXTRACT_SCALAR(r, '$.Payment_Received_Date') as TIMESTAMP)) as payment_received_date,  
         JSON_EXTRACT_SCALAR(r, '$.Payment_Method') as payment_method
     FROM data_lake._airbyte_raw_zoho_sales_orders, 
     UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
@@ -56,7 +51,7 @@ WITH source_data_automated as (
         CAST(JSON_EXTRACT_SCALAR(r, '$.Grand_Total') as NUMERIC ) as Grand_Total,
         JSON_EXTRACT_SCALAR(r, '$.Description') as Description,
         JSON_EXTRACT_SCALAR(r, '$.User_ID_payment_email') as User_ID,
-        JSON_EXTRACT_SCALAR(r, '$.Payment_Received_Date') as Payment_Received_Date,
+        DATE(CAST(JSON_EXTRACT_SCALAR(r, '$.Payment_Received_Date') AS TIMESTAMP)) as Payment_Received_Date,
         JSON_EXTRACT_SCALAR(r, '$.Payment_Method') as Payment_Method,
         FROM data_lake._airbyte_raw_zoho_be_sales_orders, 
         UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
@@ -67,20 +62,19 @@ WITH source_data_automated as (
         GREATEST(SAFE_CAST(JSON_EXTRACT_SCALAR(r, '$.Grand_Total') as NUMERIC), SAFE_CAST(JSON_EXTRACT_SCALAR(r, '$.Valeur_du_contrat') as NUMERIC)/SAFE_CAST(JSON_EXTRACT_SCALAR(r, '$.Dur_e_du_contrat_mois') as NUMERIC))  as Grand_Total,
         JSON_EXTRACT_SCALAR(r, '$.Description') as Description,
         JSON_EXTRACT_SCALAR(r, '$.Customer_No') as User_ID,
-        JSON_EXTRACT_SCALAR(r, '$.Date_1er_paiement') as Payment_Received_Date,
+        DATE(CAST(JSON_EXTRACT_SCALAR(r, '$.Date_1er_paiement') as TIMESTAMP)) as Payment_Received_Date,
         JSON_EXTRACT_SCALAR(r, '$.Type_Paiement') as Payment_Method,
         FROM data_lake._airbyte_raw_zoho_fr_sales_orders, 
         UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
 ),
 
-WITH source_data as (
+source_data as (
         
     SELECT country, SALESORDERID as ID, Payment_Received_Date, Description, Payment_Method, Grand_Total, User_ID
     FROM source_data_historical
     UNION ALL
     SELECT country, ID, Payment_Received_Date, Description, Payment_Method, Grand_Total, User_ID
     FROM source_data_automated
-),
+)
 
 SELECT * FROM source_data
-UNION ALL
