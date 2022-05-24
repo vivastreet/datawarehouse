@@ -78,6 +78,8 @@ FROM
     SUM(RTD_GROSS_GBP) RTD_GROSS_GBP,
     SUM(MTD_GROSS_GBP) MTD_GROSS_GBP,
     SUM(previous_year_revenue) previous_year_revenue,
+    AVG(previous_year_AOV)previous_year_AOV,
+    SUM(previous_year_total_orders) previous_year_orders,
     (SUM(RTD_NET)/SUM(day))*SUM(EXTRACT(DAY FROM LAST_DAY(date))) revenue_run_rate,
     (SUM(RTD_GROSS_GBP)/SUM(day))*SUM(EXTRACT(DAY FROM LAST_DAY(date))) revenue_run_rate_gross,
     (SUM(RTD_NET_LOCAL)/SUM(day))*SUM(EXTRACT(DAY FROM LAST_DAY(date))) revenue_run_rate_local,
@@ -95,8 +97,9 @@ FROM
         (SELECT SUM(net_rev) from ao_and_budgets ao2 WHERE ao.country = ao2.country and DATE_TRUNC(ao2.date, MONTH) = DATE_TRUNC(DATE_SUB(ao.date, INTERVAL 1 Year),MONTH)) previous_year_revenue,
         (SELECT SUM(total_gross_gbp) from ao_and_budgets ao2 WHERE ao.country = ao2.country and DATE_TRUNC(ao2.date, MONTH) = DATE_TRUNC(DATE_SUB(ao.date, INTERVAL 1 Year),MONTH)) previous_year_revenue_gross_gbp,
         (SELECT SUM(total_gross_local) from ao_and_budgets ao2 WHERE ao.country = ao2.country and DATE_TRUNC(ao2.date, MONTH) = DATE_TRUNC(DATE_SUB(ao.date, INTERVAL 1 Year),MONTH)) previous_year_revenue_gross_local,
-        DATE_SUB(date, INTERVAL 1 YEAR) previous_year
-        ,*
+        (SELECT COUNT(DISTINCT ao2.Order_ID) from `data-warehouse-326816.vivastreet_production.ads_orders_report` ao2 WHERE ao.country = ao2.country and date(ao2.date) = DATE_SUB(ao.date, INTERVAL 1 Year)) previous_year_total_orders,
+        (SELECT SUM(AOV) from ao_and_budgets ao2 WHERE ao.country = ao2.country and date(ao2.date) = DATE_SUB(ao.date, INTERVAL 1 Year)) previous_year_AOV,
+        *
         FROM ao_and_budgets ao
     )
     group by country, day, date, 
