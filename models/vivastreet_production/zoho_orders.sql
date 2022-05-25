@@ -68,13 +68,20 @@ source_data_automated as (
         UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
 ),
 
-source_data as (
+source_data_union as (
         
     SELECT country, SALESORDERID as ID, Payment_Received_Date, Description, Payment_Method, Grand_Total, User_ID
     FROM source_data_historical
     UNION ALL
     SELECT country, ID, Payment_Received_Date, Description, Payment_Method, Grand_Total, User_ID
     FROM source_data_automated
-)
+),
+
+source_data as (
+            SELECT * FROM (
+                SELECT k.*
+                FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM source_data_union x GROUP BY country, ID, Payment_Received_Date)
+            )
+        )
 
 SELECT * FROM source_data
