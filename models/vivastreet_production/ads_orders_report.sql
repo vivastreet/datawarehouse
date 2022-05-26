@@ -297,6 +297,7 @@ WITH categories as (
                 SELECT k.*
                 FROM ( SELECT ARRAY_AGG(x LIMIT 1)[OFFSET(0)] k  FROM ads_orders x GROUP BY Order_Id, User_ID, country)
             )
+            where country is not null
         )
         
         SELECT * FROM source_data

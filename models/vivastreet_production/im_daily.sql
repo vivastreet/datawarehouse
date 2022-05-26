@@ -34,6 +34,7 @@ WITH ao_and_budgets as (
     ON er.country = ao.country and
     DATE_TRUNC(DATE(ao.date), MONTH) = DATE_TRUNC(DATE(er.date), MONTH)
     WHERE DATE(ao.Date) > '2019-01-01' 
+    and ao.country is not null
     GROUP BY date, year, yearmonth, month, iso_week, day,country
     order by Day asc
 ),
