@@ -42,7 +42,7 @@ source_data_automated as (
         JSON_EXTRACT_SCALAR(r, '$.User_ID_payment_email') as User_ID,  
         DATE(CAST(JSON_EXTRACT_SCALAR(r, '$.Payment_Received_Date') as TIMESTAMP)) as payment_received_date,  
         JSON_EXTRACT_SCALAR(r, '$.Payment_Method') as payment_method
-    FROM data_lake._airbyte_raw_zoho_sales_orders, 
+    FROM data_lake._airbyte_raw_zoho_gb_sales_orders, 
     UNNEST(JSON_QUERY_ARRAY(JSON_EXTRACT_SCALAR(_airbyte_data, "$.details.output"), '$.data')) as r
     UNION ALL
     SELECT 
