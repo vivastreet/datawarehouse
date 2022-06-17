@@ -19,7 +19,7 @@ ao_and_budgets as (
     LEFT JOIN `data-warehouse-326816.vivastreet_production.exchange_rates` er
         ON er.country = ao.country and
         DATE_TRUNC(DATE(ao.date), MONTH) = DATE_TRUNC(DATE(er.date), MONTH)  
-    WHERE DATE(ao.Date) > '2019-01-01' 
+    WHERE DATE(ao.Date) > '2019-01-01' and DATE(ao.Date) < CURRENT_DATE()
     and ao.country is not null
     GROUP BY date, country
 ),
