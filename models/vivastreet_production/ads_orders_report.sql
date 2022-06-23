@@ -229,7 +229,7 @@ WITH categories as (
                 null as i_id,null as i_sent,null as i_email,null as i_items,null as i_country,null as i_created,null as i_category,null as i_order_id,null as i_processor_code,null as i_subtotal,null as i_total,null as i_vat, null as i_vat_percentage,
                 (SELECT ANY_VALUE(vat) from vat_rates vr WHERE LOWER(vr.country) = LOWER(zo.country) and DATE_TRUNC(DATE(SAFE_CAST(zo.payment_received_date as TIMESTAMP)), MONTH) = DATE_TRUNC(DATE(vr.date), MONTH)) vr_vat_percentage
                 FROM `data-warehouse-326816.vivastreet_production.zoho_orders` zo
-                WHERE ((zo.country = 'br')) and SAFE_CAST(zo.payment_Received_Date as TIMESTAMP) > '2022-02-01'
+                WHERE ((zo.country = 'br')) and SAFE_CAST(zo.payment_Received_Date as TIMESTAMP) < '2022-02-01'
             )
         ),
 
