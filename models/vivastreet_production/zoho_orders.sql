@@ -5,7 +5,7 @@ WITH source_data_historical as (
         CAST(PARSE_DATE('%d %b, %Y',Payment_Received_Date) as DATE) Payment_Received_Date,
         Payment_Method,
         Sales_Order_Owner,
-        SAFE_CAST(REGEXP_EXTRACT(Grand_Total, r'([0-9.]+)') as NUMERIC) Grand_Total,
+        SAFE_CAST(REGEXP_EXTRACT(REGEXP_REPLACE(Grand_Total, ',',''), r'([0-9,.]+)') as NUMERIC) Grand_Total,
         CAST(User_ID__payment_ as STRING) as User_ID,
         Description
     FROM data_lake.zoho_adhoc_gb
@@ -27,7 +27,7 @@ WITH source_data_historical as (
         CAST(PARSE_DATE('%d %b, %Y',Payment_Received_Date) as DATE) Payment_Received_Date,
         Payment_Method,
         Account_Owner as Sales_Order_Owner,
-        SAFE_CAST(REGEXP_EXTRACT(Grand_Total, r'([0-9.]+)') as NUMERIC) Grand_Total,
+        SAFE_CAST(REGEXP_EXTRACT(REGEXP_REPLACE(Grand_Total, ',',''), r'([0-9,.]+)') as NUMERIC) Grand_Total,
         CAST(User_ID__payment_ as STRING) as User_ID,
         Description
         FROM data_lake.zoho_adhoc_be
@@ -38,7 +38,7 @@ WITH source_data_historical as (
         CAST(PARSE_DATE('%d %b, %Y',Payment_Received_Date) as DATE) Payment_Received_Date,
         Payment_Method,
         Account_Owner as Sales_Order_Owner,
-        SAFE_CAST(REGEXP_EXTRACT(Grand_Total, r'([0-9.]+)') as NUMERIC) Grand_Total,
+        SAFE_CAST(REGEXP_EXTRACT(REGEXP_REPLACE(Grand_Total, ',',''), r'([0-9,.]+)') as NUMERIC) Grand_Total,
         CAST(User_ID__payment_ as STRING) as User_ID,
         Description
         FROM data_lake.zoho_adhoc_br
