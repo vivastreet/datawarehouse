@@ -1,4 +1,8 @@
-WITH daily_data as (
+with historical_data as (
+    SELECT * FROM data_lake.directa24_sheet
+),
+
+daily_data as (
     SELECT
         'br' as country,
         JSON_EXTRACT_SCALAR(r, '$.paymentMethodCode') as paymentMethodCode,
@@ -37,7 +41,7 @@ historical_and_daily_data as (
             User_Amount__local_,	
             Last_Change_Date,		
             Client_Document
-            FROM data_lake.directa24_historical
+            FROM historical_data
     UNION ALL 
     SELECT  SAFE_CAST(creationDate as TIMESTAMP) as Creation_Date,
             SAFE_CAST(idDeposit as INTEGER) as Reference,
