@@ -55,6 +55,7 @@ historical_and_daily_data as (
             SAFE_CAST(lastChangeDate as TIMESTAMP) as Last_Change_Date,
             SAFE_CAST(clientDocument as INTEGER) as Client_Document
         FROM daily_data dd
+        WHERE Status = 'COMPLETED'
 )
 
 SELECT k.*
